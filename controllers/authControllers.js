@@ -3,7 +3,7 @@ dotenv.config();
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const USER = require('../../model/userModel')
+const USER = require('../model/userModel')
 const SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
