@@ -9,7 +9,7 @@ const REFRESH_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 const sessions = new Set();
 function generateAccessToken(data) {
-    return jwt.sign(data, SECRET, { expiresIn: "30s" });
+    return jwt.sign(data, SECRET);
 };
 
 const Register = async (req, res) => {
