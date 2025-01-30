@@ -59,7 +59,7 @@ const Login = async (req, res) => {
 
     const token = generateAccessToken(token_data);
 
-    return res.json({ token, refresh_token });
+    return res.json({ token, refresh_token, user: userInfo });
 };
 
 const Token = async (req, res) => {
