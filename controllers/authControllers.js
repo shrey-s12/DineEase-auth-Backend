@@ -17,6 +17,12 @@ const Register = async (req, res) => {
         const { name, email, password, role = "Customer" } = req.body;
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(password, salt);
+
+        const existingUser = await USER.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
         const user = new USER({
             name,
             email,
