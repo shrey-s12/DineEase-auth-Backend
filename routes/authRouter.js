@@ -5,6 +5,6 @@ const { Register, Login, Token, Logout } = require('../controllers/authControlle
 router.post("/register", Register);
 router.post("/login", Login);
 router.post("/token", Token);
-router.post("/logout", Logout);
+router.delete("/logout", Logout);
 
 module.exports = router;
