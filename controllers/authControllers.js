@@ -7,9 +7,9 @@ const USER = require('../model/userModel')
 const SECRET = process.env.ACCESS_TOKEN_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-const sessions = new Set();
+const sessions = new Map();
 function generateAccessToken(data) {
-    return jwt.sign(data, SECRET);
+    return jwt.sign(data, SECRET, { expiresIn: '1m' });
 };
 
 const Register = async (req, res) => {
@@ -62,7 +62,7 @@ const Login = async (req, res) => {
     const token_data = { user: userInfo };
 
     const refresh_token = jwt.sign(token_data, REFRESH_SECRET);
-    sessions.add(refresh_token);
+    sessions.set(refresh_token, user._id);
 
     const token = generateAccessToken(token_data);
 
@@ -70,17 +70,28 @@ const Login = async (req, res) => {
 };
 
 const Token = async (req, res) => {
+    console.log("Received refresh request:", req.body); // ✅ Log request body
+
     const refresh_token = req.body.token;
-    if (!sessions.has(refresh_token)) return res.status(401).json({ message: "You need to login!" });
+    if (!refresh_token) return res.status(400).json({ message: "Refresh token missing!" });
+
+    console.log("Checking if refresh token exists in session:", refresh_token);
+    if (!sessions.has(refresh_token)) {
+        return res.status(401).json({ message: "Invalid refresh token!" });
+    }
 
     jwt.verify(refresh_token, REFRESH_SECRET, function (err, token_data) {
-        if (err) return res.status(403).json({ message: "Forbidden", error: err });
+        if (err) {
+            console.error("JWT verification error:", err);
+            return res.status(403).json({ message: "Forbidden", error: err.message });
+        }
 
-        // {user: token_data.user} Remove "iat"(Time Stamp) from the data
-        const token = generateAccessToken({ user: token_data.user });
-        return res.json({ token });
+        const newToken = generateAccessToken({ user: token_data.user });
+        console.log("New access token generated:", newToken); // ✅ Log new token
+        return res.json({ token: newToken });
     });
 };
+
 
 const Logout = async (req, res) => {
     const refreshToken = req.body.token;
