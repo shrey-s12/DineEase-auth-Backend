@@ -70,12 +70,9 @@ const Login = async (req, res) => {
 };
 
 const Token = async (req, res) => {
-    console.log("Received refresh request:", req.body); // ✅ Log request body
-
     const refresh_token = req.body.token;
     if (!refresh_token) return res.status(400).json({ message: "Refresh token missing!" });
 
-    console.log("Checking if refresh token exists in session:", refresh_token);
     if (!sessions.has(refresh_token)) {
         return res.status(401).json({ message: "Invalid refresh token!" });
     }
@@ -87,7 +84,6 @@ const Token = async (req, res) => {
         }
 
         const newToken = generateAccessToken({ user: token_data.user });
-        console.log("New access token generated:", newToken); // ✅ Log new token
         return res.json({ token: newToken });
     });
 };
